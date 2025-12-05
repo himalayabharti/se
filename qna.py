@@ -1,0 +1,44 @@
+import wikipedia
+
+while True:
+    question = input("Ask a question or type 'n' to quit: ")
+
+    if question.lower() == 'n':
+        print("Exiting the program.")
+        break
+
+    try:
+        sentences = int(input("Enter the number of sentences for the summary: "))
+    except ValueError:
+        print("Please enter a valid number for sentences.\n")
+        continue
+
+    try:
+        # First search for closest title
+        results = wikipedia.search(question)
+
+        if not results:
+            print("\nNo related pages found. Try another question.\n")
+            continue
+
+        # Use the first result
+        page_title = results[0]
+
+        # Get summary
+        answer = wikipedia.summary(page_title, sentences=sentences)
+        print(f"\nAnswer ({page_title}): {answer}\n")
+
+    except wikipedia.exceptions.DisambiguationError as e:
+        print("\nYour query is too broad. Options include:")
+        for option in e.options:
+            print("-", option)
+        print()
+
+    except wikipedia.exceptions.PageError:
+        print("\nPage not found. Try rephrasing your question.\n")
+
+    except wikipedia.exceptions.RedirectError:
+        print("\nThe page redirected unexpectedly. Try a more specific question.\n")
+
+    except wikipedia.exceptions.HTTPTimeoutError:
+        print("\nRequest timed out. Try again later.\n")
